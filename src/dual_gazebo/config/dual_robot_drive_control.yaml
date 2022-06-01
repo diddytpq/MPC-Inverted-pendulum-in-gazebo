@@ -1,0 +1,13 @@
+dual_motion_robot:
+  #Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 1000
+
+ 
+  # Position Controllers ---------------------------------------
+  chassis_pos_joint_controller:
+    type: effort_controllers/JointPositionController
+    joint: chassis_pos_joint
+    pid: {p: 100000.0, i: 0, d: 0.0}
+ 

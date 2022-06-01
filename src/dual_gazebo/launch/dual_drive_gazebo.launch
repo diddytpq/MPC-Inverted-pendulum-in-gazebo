@@ -1,0 +1,39 @@
+<launch>
+
+  <arg name="x_pos" default="0"/>
+  <arg name="y_pos" default="0"/>
+  <arg name="z_pos" default="0.8"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find dual_gazebo)/worlds/empty.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find robot_description)/urdf/dual_motion_robot_drive/dual_motion_robot.xacro'" />
+  <node name="dual_robot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+          args="-urdf -param robot_description -model dual_robot -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -R 0 -P 0 -Y 0" />
+
+  <!-- Run controller utils -->
+  <rosparam file="$(find dual_gazebo)/config/dual_robot_drive_control.yaml" command="load"/>
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+  output="screen" ns="/dual_motion_robot" args=" joint_state_controller   
+                                          chassis_pos_joint_controller "/>
+                                          
+                                            
+
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" 
+  	respawn="false" output="screen">
+    <remap from="/joint_states" to="/dual_motion_robot/joint_states" />
+  </node>
+
+
+
+</launch>

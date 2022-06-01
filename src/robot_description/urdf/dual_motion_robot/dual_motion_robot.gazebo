@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+
+  <gazebo reference="link_left_wheel">
+    <mu1>10.0</mu1>
+    <mu2>10.0</mu2>
+    <material>Gazebo/Gray</material>
+  </gazebo>
+  <gazebo reference="link_right_wheel">
+    <mu1>10.0</mu1>
+    <mu2>10.0</mu2>
+    <material>Gazebo/Gray</material>
+  </gazebo>
+  
+  <gazebo reference="link_chassis">
+      <mu1>10.0</mu1>
+      <mu2>10.0</mu2>
+      <material>Gazebo/White</material>
+  </gazebo>
+
+  <gazebo reference="wheel_link">
+      <mu1>10.0</mu1>
+      <mu2>10.0</mu2>
+      <material>Gazebo/White</material>
+  </gazebo>
+
+  <!-- <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/dual_motion_robot</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo> -->
+
+
+  <gazebo> 
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <legacyMode>false</legacyMode>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>10</updateRate>
+      <leftJoint>wheel_L_joint</leftJoint>
+      <rightJoint>wheel_R_joint</rightJoint>
+      <wheelSeparation>0.175</wheelSeparation>
+      <wheelDiameter>0.2</wheelDiameter>
+      <torque>10</torque>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+
+    </plugin>
+  </gazebo>
+
+</robot>

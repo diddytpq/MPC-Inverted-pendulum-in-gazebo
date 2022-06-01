@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<robot name="dual_motion_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+  <xacro:include filename="$(find robot_description)/urdf/dual_motion_robot/materials.xacro" />
+  <xacro:include filename="$(find robot_description)/urdf/dual_motion_robot/dual_motion_robot.gazebo" />
+  <xacro:include filename="$(find robot_description)/urdf/dual_motion_robot/macros.xacro" />
+  <xacro:include filename="$(find robot_description)/urdf/dual_motion_robot/dual_motion_robot_transmision.xacro" />
+
+  
+
+  <link name="link_chassis">
+    <!-- pose and inertial -->
+    <inertial>
+      <mass value="20"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.106208333333"/>
+    </inertial>
+    <!-- body -->
+    <collision name="collision_chassis">
+      <geometry>
+        <box size="0.7 0.7 0.07"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.7 0.7 0.07"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  </link>
+
+  <link name="wheel_link">
+    <!-- pose and inertial -->
+    <pose>0 0 0.1 0 0 0</pose>
+    <inertial>
+      <mass value="0.001"/>
+      <origin rpy="0 0 0" xyz="0 0 0.1"/>
+      <inertia ixx="0.0395416666667" ixy="0" ixz="0" iyy="0.106208333333" iyz="0" izz="0.106208333333"/>
+    </inertial>
+    <!-- body -->
+    <collision name="collision_wheel_link">
+      <geometry>
+        <box size="0.07 0.4 0.2"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.07 0.4 0.2"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  </link>
+
+  <xacro:link_wheel name="link_right_wheel" />
+  <xacro:joint_wheel name="wheel_R_joint" child="link_right_wheel" origin_xyz="0 0.20 -0.1" />
+    
+  <xacro:link_wheel name="link_left_wheel" />
+  <xacro:joint_wheel name="wheel_L_joint" child="link_left_wheel" origin_xyz="0 -0.20 -0.1" />
+
+  <xacro:base_joint name="chassis_pos_joint" child="link_chassis" origin_xyz="0 0 0.11" />
+  <!-- <xacro:SimpleTransmissionPosition n="1" joint="chassis_pos_joint" /> -->
+  
+</robot>

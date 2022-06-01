@@ -1,0 +1,38 @@
+<launch>
+
+  <arg name="x_pos" default="0"/>
+  <arg name="y_pos" default="0"/>
+  <arg name="z_pos" default="0.3"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find dual_gazebo)/worlds/empty.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find robot_description)/urdf/kitech_segway/kitech_segway_stl.xacro'" />
+  
+  <node name="dual_robot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+          args="-urdf -param robot_description -model dual_robot -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos)" />
+
+  <!-- Run controller utils -->
+  <rosparam file="$(find dual_gazebo)/config/kitech_robot_control.yaml" command="load"/>
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+  output="screen" ns="/kitech_robot" args=" joint_state_controller 
+                                            mp_left_wheel_joint_controller
+                                            mp_right_wheel_joint_controller"/>
+
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" 
+  	respawn="false" output="screen">
+    <remap from="/joint_states" to="/kitech_robot/joint_states" />
+  </node>
+
+
+</launch>

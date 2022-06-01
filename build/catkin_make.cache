@@ -1,0 +1,2 @@
+dual_gazebo:robot_description
+-DPYTHON_EXECUTABLE=/usr/bin/python3 -DCATKIN_DEVEL_PREFIX=/home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/devel -DCMAKE_INSTALL_PREFIX=/home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/install -G Unix Makefiles
