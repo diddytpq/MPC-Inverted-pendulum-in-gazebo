@@ -25,15 +25,15 @@
       <material>Gazebo/White</material>
   </gazebo>
 
-  <gazebo>
+  <!-- <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/dual_motion_robot</robotNamespace>
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
-  </gazebo>
+  </gazebo> -->
 
 
-  <!-- <gazebo> 
+  <gazebo> 
     <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
       <legacyMode>false</legacyMode>
       <alwaysOn>true</alwaysOn>
@@ -49,6 +49,6 @@
       <robotBaseFrame>base_footprint</robotBaseFrame>
 
     </plugin>
-  </gazebo> -->
+  </gazebo>
 
 </robot>

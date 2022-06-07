@@ -13,18 +13,18 @@
     <arg name="debug" value="false"/>
   </include>
 
-
+  <!-- <rosparam file="$(find  dual_gazebo)/config/dual_robot_control.yaml" command="load"/> -->
 
   <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find robot_description)/urdf/dual_motion_robot_drive/dual_motion_robot.xacro'" />
   <node name="dual_robot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
           args="-urdf -param robot_description -model dual_robot -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -R 0 -P 0 -Y 0" />
 
   <!-- Run controller utils -->
-  <rosparam file="$(find dual_gazebo)/config/dual_robot_drive_control.yaml" command="load"/>
+  <!-- <rosparam file="$(find dual_gazebo)/config/dual_robot_drive_control.yaml" command="load"/> -->
 
-  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+  <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
   output="screen" ns="/dual_motion_robot" args=" joint_state_controller   
-                                          chassis_pos_joint_controller "/>
+                                          chassis_pos_joint_controller "/> -->
                                           
                                             
 

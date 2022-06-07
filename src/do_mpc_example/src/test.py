@@ -14,7 +14,7 @@ model_type = 'continuous' # either 'discrete' or 'continuous'
 model = do_mpc.model.Model(model_type)
 
 
-m0 = 6  # kg, mass of the cart
+m0 = 11  # kg, mass of the cart
 m1 = 10  # kg, mass of the first rod
 L1 = 0.5  # m,  length of the first rod
 
@@ -82,7 +82,7 @@ model.setup()
 mpc = do_mpc.controller.MPC(model)
 
 setup_mpc = {
-    'n_horizon': 30,
+    'n_horizon': 15,
     'n_robust': 0,
     'open_loop': 0,
     't_step': 0.04,
@@ -104,8 +104,11 @@ mpc.set_objective(mterm=mterm, lterm=lterm)
 mpc.set_rterm(force=0.01)
 
 
-mpc.bounds['lower','_u','force'] = -150
-mpc.bounds['upper','_u','force'] = 150
+mpc.bounds['lower','_u','force'] = -60
+mpc.bounds['upper','_u','force'] = 60
+
+mpc.bounds['lower','_x','theta'] = -0.174533
+mpc.bounds['upper','_x','theta'] = 0.174533
 
 mpc.setup()
 
@@ -123,7 +126,7 @@ params_simulator = {
 
 simulator.set_param(**params_simulator)
 
-simulator.x0['theta'] = 0.3*np.pi
+simulator.x0['theta'] = 0.174533  # 10 deg
 
 x0 = simulator.x0.cat.full()
 
@@ -216,6 +219,10 @@ mpc.reset_history()
 simulator.setup()
 
 n_steps = 100
+
+data_list_x = []
+data_list_u = []
+
 for k in range(n_steps):
     u0 = mpc.make_step(x0)
     print(k)
@@ -223,10 +230,13 @@ for k in range(n_steps):
     x0 = estimator.make_step(y_next)
     print("--------------------------------------------------")
 
-    print(x0)
+    print(type(x0))
+    data_list_x.append(x0)
+    data_list_u.append(u0)
     print("--------------------------------------------------")
 
-
+for i in range(len(data_list_x)):
+    print(i, data_list_x[i], data_list_u[i])
 
 import matplotlib
 from matplotlib.animation import FuncAnimation, FFMpegWriter, ImageMagickWriter
@@ -244,5 +254,5 @@ def update(t_ind):
 
 
 anim = FuncAnimation(fig, update, frames=n_steps, repeat=False)
-anim.save('anim_dip_1.gif', writer='imagemagick', fps = 30)
+anim.save('test.gif', writer='imagemagick', fps = 30)
 

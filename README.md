@@ -4,7 +4,7 @@
 
 ### Run Gazebo sim
 ```bash
-roslaunch dual_gazebo dual_gazebo.launch
+roslaunch dual_gazebo dual_drive_gazebo.launch
 ```
 
 ### Run MPC example
