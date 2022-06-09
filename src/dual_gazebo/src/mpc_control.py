@@ -6,15 +6,13 @@ from geometry_msgs.msg import *
 from sensor_msgs.msg import Image
 import sys, select, os
 import roslib
-if os.name == 'nt':
-  import msvcrt
-else:
-  import tty, termios
+from std_srvs.srv import Empty
 
 import mpc_tool as mpc
 
 roslib.load_manifest('dual_gazebo')
 
+reset_sim_time = rospy.ServiceProxy("/gazebo/reset_world", Empty)
 g_get_state = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
 
 def qua2eular(x,y,z,w):
@@ -40,7 +38,7 @@ def qua2eular(x,y,z,w):
     return roll_x, pitch_y, yaw_z # in radians
 
 
-def move_mecanum(data):
+def move_robot(data):
     # start publisher of cmd_vel to control mecanum
 
     linear, angular = data
@@ -49,6 +47,18 @@ def move_mecanum(data):
     twist = Twist()
 
     twist.linear.x = linear
+
+    pub.publish(twist)
+
+    print(twist)
+
+def stop_robot():
+    # start publisher of cmd_vel to control mecanum
+
+    pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+    twist = Twist()
+
+    twist.linear.x = 0
 
     pub.publish(twist)
 
@@ -83,11 +93,12 @@ if __name__ == '__main__':
     rospy.init_node('mecanum_key')
 
 
+    reset_sim_time()
     robot, robot_vel = get_model_status()
 
     roll_x, pitch_y, yaw_z = qua2eular(robot.orientation.x, robot.orientation.y, robot.orientation.z, robot.orientation.w)
 
-    mpc_model, _, u0 = mpc.set_model(pitch_y)
+    mpc_model, estimator, u0 = mpc.set_model(pitch_y)
     
     x0 = np.array([[robot.position.x],
                     [pitch_y],
@@ -96,17 +107,30 @@ if __name__ == '__main__':
 
     linear = [0, 0, 0]
     angular = [0, 0, 0]
+    import time
+    time.sleep(1)
+    reset_sim_time()
+
 
     while(1):
         u0 = mpc_model.make_step(x0)
 
-        input_vel = u0 / 21 
-        
-        move_mecanum([input_vel, 0])
+        input_vel = u0 / 21 * 1
+        # time.sleep(0.03)
+
+        move_robot([input_vel, 0])
+
 
         robot, robot_vel = get_model_status()
         roll_x, pitch_y, yaw_z = qua2eular(robot.orientation.x, robot.orientation.y, robot.orientation.z, robot.orientation.w)
-        x0 = np.array([[robot.position.x],
+        y_next = np.array([[robot.position.x],
                     [pitch_y],
                     [robot_vel.linear.x],
                     [robot_vel.angular.y]])
+
+
+        x0 = estimator.make_step(y_next)
+
+        # stop_robot()
+
+

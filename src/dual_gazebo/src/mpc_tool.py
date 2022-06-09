@@ -7,11 +7,13 @@ sys.path.append('../../../')
 
 # Import do_mpc package:
 import do_mpc
+import rospy
+
 
 
 def set_model(init_angle):
 
-    model_type = 'continuous' # either 'discrete' or 'continuous'
+    model_type = 'discrete' # either 'discrete' or 'continuous'
     model = do_mpc.model.Model(model_type)
 
 
@@ -71,8 +73,7 @@ def set_model(init_angle):
 
     E_kin = E_kin_cart + E_kin_p1 
 
-    E_pot = m1 * g * l1 * cos(
-    theta[0]) 
+    E_pot = m1 * g * l1 * cos(theta[0]) 
 
     model.set_expression('E_kin', E_kin)
     model.set_expression('E_pot', E_pot)
@@ -83,18 +84,25 @@ def set_model(init_angle):
     mpc = do_mpc.controller.MPC(model)
 
     setup_mpc = {
-        'n_horizon': 30,
-        'n_robust': 0,
+        'n_horizon': 5,
+        'n_robust': 1,
         'open_loop': 0,
-        't_step': 0.04,
-        'state_discretization': 'collocation',
-        'collocation_type': 'radau',
-        'collocation_deg': 3,
-        'collocation_ni': 1,
-        'store_full_solution': True,
-        # Use MA27 linear solver in ipopt for faster calculations:
+        't_step': 0.01,
+        # 'state_discretization': 'collocation',
+        # 'collocation_type': 'radau',
+        # 'collocation_deg': 3,
+        # 'collocation_ni': 1,
+        # 'store_full_solution': True,
         'nlpsol_opts': {'ipopt.linear_solver': 'mumps'}
+
+        # Use MA27 linear solver in ipopt for faster calculations:
     }
+    # setup_mpc = {
+    # 'n_horizon': 2,
+    # 't_step': 0.05,
+    # 'nlpsol_opts': {'ipopt.linear_solver': 'mumps'}
+
+    # }
     mpc.set_param(**setup_mpc)
 
     mterm = model.aux['E_kin'] - model.aux['E_pot'] # terminal cost
@@ -102,14 +110,14 @@ def set_model(init_angle):
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
     # Input force is implicitly restricted through the objective.
-    mpc.set_rterm(force=0.01)
+    mpc.set_rterm(force=0)
 
 
-    mpc.bounds['lower','_u','force'] = -150
-    mpc.bounds['upper','_u','force'] = 150
+    # mpc.bounds['lower','_u','force'] = -56
+    # mpc.bounds['upper','_u','force'] = 56
 
-    mpc.bounds['lower','_x','theta'] = -0.174533
-    mpc.bounds['upper','_x','theta'] = 0.174533
+    mpc.bounds['lower','_x','theta'] = -0.174533 * 2
+    mpc.bounds['upper','_x','theta'] = 0.174533 * 2
 
     mpc.setup()
 
@@ -145,7 +153,7 @@ def set_model(init_angle):
 
     simulator.setup()
 
-    return mpc, x0, u0
+    return mpc, estimator, u0
 
 
 

@@ -85,7 +85,7 @@ setup_mpc = {
     'n_horizon': 15,
     'n_robust': 0,
     'open_loop': 0,
-    't_step': 0.04,
+    't_step': 0.01,
     'state_discretization': 'collocation',
     'collocation_type': 'radau',
     'collocation_deg': 3,
@@ -230,7 +230,7 @@ for k in range(n_steps):
     x0 = estimator.make_step(y_next)
     print("--------------------------------------------------")
 
-    print(type(x0))
+    print((y_next))
     data_list_x.append(x0)
     data_list_u.append(u0)
     print("--------------------------------------------------")
