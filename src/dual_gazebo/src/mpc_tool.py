@@ -7,7 +7,6 @@ sys.path.append('../../../')
 
 # Import do_mpc package:
 import do_mpc
-import rospy
 
 
 
@@ -24,7 +23,7 @@ def set_model(init_angle):
     g = 9.80665 # m/s^2, Gravity
 
 
-    l1 = L1/2 # m,
+    l1 = 2 * L1/3 # m,
 
     J1 = 0.2124 #(m1 * l1**2) / 3   # Inertia
 
@@ -88,13 +87,14 @@ def set_model(init_angle):
         'n_horizon': 5,
         'n_robust': 0,
         'open_loop': 0,
-        't_step': 0.04,
-        'state_discretization': 'collocation',
-        'collocation_type': 'radau',
-        'collocation_deg': 3,
-        'collocation_ni': 1,
-        'store_full_solution': True,
-        # 'nlpsol_opts': {'ipopt.linear_solver': 'mumps'}
+        't_step': 0.03,
+        # 'state_discretization': 'collocation',
+        # 'collocation_type': 'radau',
+        # 'collocation_deg': 3,
+        # 'collocation_ni': 1,
+        'store_full_solution': False,
+        'store_lagr_multiplier' : False,
+        'nlpsol_opts': {'ipopt.linear_solver': 'mumps'}
         # 'nlpsol_opts': {'ipopt.linear_solver': 'ma27'}
         # Use MA27 linear solver in ipopt for faster calculations:
     }
@@ -106,15 +106,13 @@ def set_model(init_angle):
     # }
     mpc.set_param(**setup_mpc)
 
-    # mterm = model.aux['E_kin'] - model.aux['E_pot'] # terminal cost
-    # lterm = model.aux['E_kin'] - model.aux['E_pot'] # stage cost
+    mterm = model.aux['E_kin'] - model.aux['E_pot'] # terminal cost
+    lterm = (model.aux['E_kin'] - model.aux['E_pot']) + 1000*(model.x['pos']- 0 )**2# stage cost
 
-    # mpc.set_objective(mterm=mterm, lterm=lterm)
-    # # Input force is implicitly restricted through the objective.
-    # mpc.set_rterm(force=100)
 
-    mterm = model.aux['E_kin'] - model.aux['E_pot']
-    lterm = -model.aux['E_pot']+10*(model.x['pos'])**2 # stage cost
+
+    # mterm = model.aux['E_kin'] - model.aux['E_pot']
+    # lterm = -model.aux['E_pot']+10*(model.x['pos'])**2 # stage cost
 
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
@@ -123,8 +121,8 @@ def set_model(init_angle):
     # mpc.bounds['lower','_u','force'] = -10
     # mpc.bounds['upper','_u','force'] = 10
 
-    mpc.bounds['lower','_x','theta'] = -0.174533 * 9
-    mpc.bounds['upper','_x','theta'] = 0.174533 * 9
+    # mpc.bounds['lower','_x','theta'] = -0.174533 * 1
+    # mpc.bounds['upper','_x','theta'] = 0.174533 * 1
 
     # mpc.bounds['lower','_x','pos'] = -1
     # mpc.bounds['upper','_x','pos'] = 1
@@ -166,23 +164,3 @@ def set_model(init_angle):
     return mpc, estimator, u0
 
 
-
-    n_steps = 100
-
-    data_list_x = []
-    data_list_u = []
-
-    for k in range(n_steps):
-        u0 = mpc.make_step(x0)
-        print(k)
-        y_next = simulator.make_step(u0)
-        x0 = estimator.make_step(y_next)
-        print("--------------------------------------------------")
-
-        print(x0)
-        data_list_x.append(x0)
-        data_list_u.append(u0)
-        print("--------------------------------------------------")
-
-    for i in range(len(data_list_x)):
-        print(i, data_list_x[i], data_list_u[i])

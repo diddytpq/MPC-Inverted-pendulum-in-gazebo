@@ -82,7 +82,7 @@ model.setup()
 mpc = do_mpc.controller.MPC(model)
 
 setup_mpc = {
-    'n_horizon': 15,
+    'n_horizon': 5,
     'n_robust': 0,
     'open_loop': 0,
     't_step': 0.01,
@@ -90,7 +90,7 @@ setup_mpc = {
     'collocation_type': 'radau',
     'collocation_deg': 3,
     'collocation_ni': 1,
-    'store_full_solution': True,
+    'store_full_solution': False,
     # Use MA27 linear solver in ipopt for faster calculations:
     'nlpsol_opts': {'ipopt.linear_solver': 'mumps'}
 }

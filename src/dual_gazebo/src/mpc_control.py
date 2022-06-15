@@ -10,6 +10,8 @@ from std_srvs.srv import Empty
 
 import mpc_tool as mpc
 
+import time
+
 roslib.load_manifest('dual_gazebo')
 
 reset_sim_time = rospy.ServiceProxy("/gazebo/reset_world", Empty)
@@ -110,13 +112,19 @@ if __name__ == '__main__':
     import time
     time.sleep(1)
     reset_sim_time()
+    t0 = time.time()
 
 
     while(1):
-        u0 = mpc_model.make_step(x0)
 
-        input_vel = u0 / 21 
+        u0 = mpc_model.make_step(x0)
+        t1 = time.time()
+
+        input_vel =( u0 / 2 / 21 ) + robot_vel.linear.x
+        # input_vel =( u0 * (t1 - t0) / 21 ) + robot_vel.linear.x
+
         # time.sleep(0.03)
+        t0 = time.time()
 
         move_robot([input_vel, 0])
 
@@ -128,9 +136,7 @@ if __name__ == '__main__':
                     [robot_vel.linear.x],
                     [robot_vel.angular.y]])
 
-
-        x0 = estimator.make_step(x0)
-
-        # stop_robot()
+        print(x0)
+        # x0 = estimator.make_step(x0)
 
 

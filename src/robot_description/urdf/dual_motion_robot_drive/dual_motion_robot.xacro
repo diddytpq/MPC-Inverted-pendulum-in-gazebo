@@ -41,6 +41,7 @@
     <!-- body -->
     <collision name="collision_wheel_link">
       <geometry>
+        <!-- <box size="0.07 0.4 0.4"/> -->
         <box size="0.07 0.4 0.2"/>
       </geometry>
     </collision>
@@ -48,6 +49,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <box size="0.07 0.4 0.2"/>
+        <!-- <box size="0.07 0.4 0.4"/> -->
       </geometry>
       <material name="blue"/>
     </visual>
@@ -55,10 +57,13 @@
 
   <xacro:link_wheel name="link_right_wheel" />
   <xacro:joint_wheel name="wheel_R_joint" child="link_right_wheel" origin_xyz="0 0.20 -0.1" />
+  <!-- <xacro:joint_wheel name="wheel_R_joint" child="link_right_wheel" origin_xyz="0 0.20 -0.2" /> -->
     
   <xacro:link_wheel name="link_left_wheel" />
+  <!-- <xacro:joint_wheel name="wheel_L_joint" child="link_left_wheel" origin_xyz="0 -0.20 -0.2" /> -->
   <xacro:joint_wheel name="wheel_L_joint" child="link_left_wheel" origin_xyz="0 -0.20 -0.1" />
 
   <xacro:base_joint name="chassis_pos_joint" child="link_chassis" origin_xyz="0 0 0.1" />
+  <!-- <xacro:base_joint name="chassis_pos_joint" child="link_chassis" origin_xyz="0 0 0.2" /> -->
   
 </robot>
