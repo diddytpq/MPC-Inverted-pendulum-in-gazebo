@@ -17,13 +17,13 @@ def set_model(init_angle):
 
 
     m0 = 6  # kg, mass of the cart
-    m1 = 18  # kg, mass of the first rod
+    m1 = 15  # kg, mass of the first rod
     L1 = 0.2  # m,  length of the first rod
 
     g = 9.80665 # m/s^2, Gravity
 
 
-    l1 = 2 * L1/3 # m,
+    l1 = L1/3 # m,
 
     J1 = 0.2124 #(m1 * l1**2) / 3   # Inertia
 
@@ -79,15 +79,16 @@ def set_model(init_angle):
 
 
 
+
     model.setup()
 
     mpc = do_mpc.controller.MPC(model)
 
     setup_mpc = {
-        'n_horizon': 5,
+        'n_horizon': 50,
         'n_robust': 0,
         'open_loop': 0,
-        't_step': 0.03,
+        't_step': 0.01,
         # 'state_discretization': 'collocation',
         # 'collocation_type': 'radau',
         # 'collocation_deg': 3,
@@ -107,7 +108,7 @@ def set_model(init_angle):
     mpc.set_param(**setup_mpc)
 
     mterm = model.aux['E_kin'] - model.aux['E_pot'] # terminal cost
-    lterm = (model.aux['E_kin'] - model.aux['E_pot']) + 1000*(model.x['pos']- 0 )**2# stage cost
+    lterm = (model.aux['E_kin'] - model.aux['E_pot']) # stage cost
 
 
 
@@ -116,7 +117,7 @@ def set_model(init_angle):
 
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    mpc.set_rterm(force=0.1)
+    mpc.set_rterm(force=100)
 
     # mpc.bounds['lower','_u','force'] = -10
     # mpc.bounds['upper','_u','force'] = 10

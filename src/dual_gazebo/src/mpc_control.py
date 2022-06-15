@@ -120,8 +120,12 @@ if __name__ == '__main__':
         u0 = mpc_model.make_step(x0)
         t1 = time.time()
 
+        # input_vel =( u0 / 2 / 21 ) 
         input_vel =( u0 / 2 / 21 ) + robot_vel.linear.x
+        
         # input_vel =( u0 * (t1 - t0) / 21 ) + robot_vel.linear.x
+
+        print("time",(t1 - t0))
 
         # time.sleep(0.03)
         t0 = time.time()
@@ -137,6 +141,6 @@ if __name__ == '__main__':
                     [robot_vel.angular.y]])
 
         print(x0)
-        # x0 = estimator.make_step(x0)
+        x0 = estimator.make_step(x0)
 
 
