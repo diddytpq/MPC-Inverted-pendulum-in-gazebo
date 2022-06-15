@@ -1,4 +1,4 @@
-prefix=/home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/install
+prefix=/home/yoseph/worckspace/MPC-Inverted-pendulum-in-gazebo/install
 
 Name: dual_gazebo
 Description: Description of dual_gazebo

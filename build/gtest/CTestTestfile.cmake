@@ -1,6 +1,6 @@
 # CMake generated Testfile for 
 # Source directory: /usr/src/googletest
-# Build directory: /home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/build/gtest
+# Build directory: /home/yoseph/worckspace/MPC-Inverted-pendulum-in-gazebo/build/gtest
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.

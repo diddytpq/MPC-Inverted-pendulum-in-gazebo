@@ -5,7 +5,7 @@
             <inertial>
               <mass value="3"/>
               <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
-              <inertia ixx="0.000526666666667" ixy="0" ixz="0" iyy="0.000526666666667" iyz="0" izz="0.001"/>
+              <inertia ixx="0.0115" ixy="0" ixz="0" iyy="0.0115" iyz="0" izz="0.15"/>
             </inertial>
             <collision name="link_right_wheel_collision">
               <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
@@ -46,7 +46,7 @@
         <child link="${child}"/>
         <parent link="wheel_link"/>
         <axis rpy="0 0 0" xyz="1 0 0"/>
-        <limit effort="10" lower="-0.35" upper="0.35" velocity="0.1" />
+        <!-- <limit effort="10" lower="-0.35" upper="0.35" velocity="0.1" /> -->
       </joint>
     </xacro:macro>
     

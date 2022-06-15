@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "robot_description"
-PROJECT_SPACE_DIR = "/home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/devel"
+PROJECT_SPACE_DIR = "/home/yoseph/worckspace/MPC-Inverted-pendulum-in-gazebo/devel"
 PROJECT_VERSION = "0.0.0"

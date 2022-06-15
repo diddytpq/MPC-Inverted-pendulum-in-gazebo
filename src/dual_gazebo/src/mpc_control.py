@@ -115,7 +115,7 @@ if __name__ == '__main__':
     while(1):
         u0 = mpc_model.make_step(x0)
 
-        input_vel = u0 / 21 * 1
+        input_vel = u0 / 21 
         # time.sleep(0.03)
 
         move_robot([input_vel, 0])
@@ -123,13 +123,13 @@ if __name__ == '__main__':
 
         robot, robot_vel = get_model_status()
         roll_x, pitch_y, yaw_z = qua2eular(robot.orientation.x, robot.orientation.y, robot.orientation.z, robot.orientation.w)
-        y_next = np.array([[robot.position.x],
+        x0 = np.array([[robot.position.x],
                     [pitch_y],
                     [robot_vel.linear.x],
                     [robot_vel.angular.y]])
 
 
-        x0 = estimator.make_step(y_next)
+        x0 = estimator.make_step(x0)
 
         # stop_robot()
 

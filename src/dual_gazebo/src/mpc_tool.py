@@ -17,16 +17,16 @@ def set_model(init_angle):
     model = do_mpc.model.Model(model_type)
 
 
-    m0 = 11  # kg, mass of the cart
-    m1 = 10  # kg, mass of the first rod
-    L1 = 0.5  # m,  length of the first rod
+    m0 = 6  # kg, mass of the cart
+    m1 = 18  # kg, mass of the first rod
+    L1 = 0.2  # m,  length of the first rod
 
     g = 9.80665 # m/s^2, Gravity
 
 
     l1 = L1/2 # m,
 
-    J1 = (m1 * l1**2) / 3   # Inertia
+    J1 = 0.2124 #(m1 * l1**2) / 3   # Inertia
 
 
     h1 = m0 + m1
@@ -79,22 +79,23 @@ def set_model(init_angle):
     model.set_expression('E_pot', E_pot)
 
 
+
     model.setup()
 
     mpc = do_mpc.controller.MPC(model)
 
     setup_mpc = {
         'n_horizon': 5,
-        'n_robust': 1,
+        'n_robust': 0,
         'open_loop': 0,
-        't_step': 0.01,
-        # 'state_discretization': 'collocation',
-        # 'collocation_type': 'radau',
-        # 'collocation_deg': 3,
-        # 'collocation_ni': 1,
-        # 'store_full_solution': True,
-        'nlpsol_opts': {'ipopt.linear_solver': 'mumps'}
-
+        't_step': 0.04,
+        'state_discretization': 'collocation',
+        'collocation_type': 'radau',
+        'collocation_deg': 3,
+        'collocation_ni': 1,
+        'store_full_solution': True,
+        # 'nlpsol_opts': {'ipopt.linear_solver': 'mumps'}
+        # 'nlpsol_opts': {'ipopt.linear_solver': 'ma27'}
         # Use MA27 linear solver in ipopt for faster calculations:
     }
     # setup_mpc = {
@@ -105,19 +106,28 @@ def set_model(init_angle):
     # }
     mpc.set_param(**setup_mpc)
 
-    mterm = model.aux['E_kin'] - model.aux['E_pot'] # terminal cost
-    lterm = model.aux['E_kin'] - model.aux['E_pot'] # stage cost
+    # mterm = model.aux['E_kin'] - model.aux['E_pot'] # terminal cost
+    # lterm = model.aux['E_kin'] - model.aux['E_pot'] # stage cost
+
+    # mpc.set_objective(mterm=mterm, lterm=lterm)
+    # # Input force is implicitly restricted through the objective.
+    # mpc.set_rterm(force=100)
+
+    mterm = model.aux['E_kin'] - model.aux['E_pot']
+    lterm = -model.aux['E_pot']+10*(model.x['pos'])**2 # stage cost
+
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    # Input force is implicitly restricted through the objective.
-    mpc.set_rterm(force=0)
+    mpc.set_rterm(force=0.1)
 
+    # mpc.bounds['lower','_u','force'] = -10
+    # mpc.bounds['upper','_u','force'] = 10
 
-    # mpc.bounds['lower','_u','force'] = -56
-    # mpc.bounds['upper','_u','force'] = 56
+    mpc.bounds['lower','_x','theta'] = -0.174533 * 9
+    mpc.bounds['upper','_x','theta'] = 0.174533 * 9
 
-    mpc.bounds['lower','_x','theta'] = -0.174533 * 2
-    mpc.bounds['upper','_x','theta'] = 0.174533 * 2
+    # mpc.bounds['lower','_x','pos'] = -1
+    # mpc.bounds['upper','_x','pos'] = 1
 
     mpc.setup()
 
@@ -130,7 +140,7 @@ def set_model(init_angle):
         'integration_tool': 'idas',
         'abstol': 1e-10,
         'reltol': 1e-10,
-        't_step': 0.01
+        't_step': 0.03
     }
 
     simulator.set_param(**params_simulator)
