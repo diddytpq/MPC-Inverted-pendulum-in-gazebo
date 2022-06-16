@@ -16,57 +16,76 @@ def set_model(init_angle):
     model_type = 'discrete' # either 'discrete' or 'continuous'
     model = do_mpc.model.Model(model_type)
 
-    u = model.set_variable('_u',  'force')
+    # States struct (optimization variables):
+    pos = model.set_variable(var_type='_x', var_name='pos', shape=(1,1))
+    theta = model.set_variable(var_type='_x', var_name='theta', shape=(1,1))
+    dpos = model.set_variable(var_type='_x', var_name='dpos', shape=(1,1))
+    dtheta = model.set_variable(var_type='_x', var_name='dtheta', shape=(1,1))
+
+    # Input struct (optimization variables):
+    u = model.set_variable(var_type='_u', var_name='u', shape=(1,1))
 
 
-
-
-    _x = model.set_variable(var_type='_x', var_name='x', shape=(4,1))
-    _u = model.set_variable(var_type='_u', var_name='u', shape=(1,1))
-
-    M = 6  # mass of the cart 
+    M = 2  # mass of the cart 
     m = 15  # mass of the pendulum    
     b = 0.1  # coefficient of friction for cart   
     I = 0.2124  # mass moment of inertia of the pendulum 
-    g = 9.8
+    g = -9.8
     l = 0.3 # length to pendulum center of mass  
 
     p = I*(M+m)+M*m*l**2
 
-    A = [[0, 1, 0, 0],
-        [0 ,-(I+m*l**2)*b/p,  (m**2*g*l**2)/p,   0],
-    [ 0,0,0,1],
-        [0, -(m*l*b)/p,m*g*l*(M+m)/p,  0]]
+    A = [[0, 0, 1, 0],
+        [ 0,0,0,1],
+        [0 ,(m**2*g*l**2)/p,  -(I+m*l**2)*b/p,   0],
+        [0, m*g*l*(M+m)/p, -(m*l*b)/p,  0]]
+
     B =[ [0],
+        [0],
         [(I+m*l**2)/p],
-            [0],
-            [m*l/p]]
+        [m*l/p]]
+    
     C = [[1, 0, 0, 0],
-        [0 ,1, 0, 0],]
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]]
+
     D = [[0],
-        [0]]
+    [0],
+    [0],
+    [0]]
 
 
-    Ad = c2d(ss(A,B,C,D),0.05).A
-    Bd = c2d(ss(A,B,C,D),0.05).B
-    Cd = c2d(ss(A,B,C,D),0.05).C
-    Dd = c2d(ss(A,B,C,D),0.05).D
+    # C = [[1, 0, 0, 0],
+    # [0, 0, 1, 0]]
 
-    x_next = Ad@_x + Bd@_u
-
-    model.set_rhs('x', x_next)
+    # D = [[0],
+    #     [0]]
 
 
-    model.set_expression(expr_name='cost', expr=sum1(_x**2))
+    Ad = c2d(ss(A,B,C,D),0.5).A
+    Bd = c2d(ss(A,B,C,D),0.5).B
+    Cd = c2d(ss(A,B,C,D),0.5).C
+    Dd = c2d(ss(A,B,C,D),0.5).D
 
+    x_1_next = Ad[:,0][0]*pos + Ad[:,1][0]*theta + Ad[:,2][0]*dpos + Ad[:,3][0]*dtheta + Bd[:,0][0]*u 
+    x_2_next = Ad[:,0][1]*pos + Ad[:,1][1]*theta + Ad[:,2][1]*dpos + Ad[:,3][1]*dtheta + Bd[:,0][1]*u 
+    x_3_next = Ad[:,0][2]*pos + Ad[:,1][2]*theta + Ad[:,2][2]*dpos + Ad[:,3][2]*dtheta + Bd[:,0][2]*u 
+    x_4_next = Ad[:,0][3]*pos + Ad[:,1][3]*theta + Ad[:,2][3]*dpos + Ad[:,3][3]*dtheta + Bd[:,0][3]*u  
 
+    model.set_rhs('pos', x_1_next)
+    model.set_rhs('theta', x_2_next)
+    model.set_rhs('dpos', x_3_next)
+    model.set_rhs('dtheta', x_4_next)
+
+    model.set_expression(expr_name='cost', expr=sum1(pos**2 + theta**2 + dpos**2))
 
     model.setup()
 
     mpc = do_mpc.controller.MPC(model)
 
     setup_mpc = {
-        'n_horizon': 10,
+        'n_horizon': 150,
         'n_robust': 0,
         'open_loop': 0,
         't_step': 0.01,
@@ -88,17 +107,11 @@ def set_model(init_angle):
     # }
     mpc.set_param(**setup_mpc)
 
-    mterm =  model.aux['cost'] # terminal cost
-    lterm =  model.aux['cost'] # stage cost
-
-
-
-    # mterm = model.aux['E_kin'] - model.aux['E_pot']
-    # lterm = -model.aux['E_pot']+10*(model.x['pos'])**2 # stage cost
-
+    mterm = model.aux['cost']
+    lterm = model.aux['cost'] # terminal cost
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    mpc.set_rterm(u=25)
+    mpc.set_rterm(u=0.1)
 
     # mpc.bounds['lower','_u','force'] = -10
     # mpc.bounds['upper','_u','force'] = 10
@@ -125,7 +138,7 @@ def set_model(init_angle):
 
     simulator.set_param(**params_simulator)
 
-    # simulator.x0['theta'] = init_angle  # 0 deg
+    simulator.x0['theta'] = init_angle  # 0 deg
 
     x0 = simulator.x0.cat.full()
 
@@ -140,8 +153,6 @@ def set_model(init_angle):
 
     # Quickly reset the history of the MPC data object.
     mpc.reset_history()
-
-    simulator.setup()
 
     return mpc, estimator, u0
 

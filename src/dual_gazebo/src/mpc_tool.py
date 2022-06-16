@@ -12,11 +12,11 @@ import do_mpc
 
 def set_model(init_angle):
 
-    model_type = 'discrete' # either 'discrete' or 'continuous'
+    model_type = 'continuous' # either 'discrete' or 'continuous'
     model = do_mpc.model.Model(model_type)
 
 
-    m0 = 6  # kg, mass of the cart
+    m0 = 2  # kg, mass of the cart
     m1 = 15  # kg, mass of the first rod
     L1 = 0.2  # m,  length of the first rod
 
@@ -85,7 +85,7 @@ def set_model(init_angle):
     mpc = do_mpc.controller.MPC(model)
 
     setup_mpc = {
-        'n_horizon': 50,
+        'n_horizon': 100,
         'n_robust': 0,
         'open_loop': 0,
         't_step': 0.01,
@@ -117,7 +117,7 @@ def set_model(init_angle):
 
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    mpc.set_rterm(force=100)
+    mpc.set_rterm(force=0.1)
 
     # mpc.bounds['lower','_u','force'] = -10
     # mpc.bounds['upper','_u','force'] = 10

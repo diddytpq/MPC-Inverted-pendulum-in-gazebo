@@ -121,9 +121,9 @@ if __name__ == '__main__':
         t1 = time.time()
 
         # input_vel =( u0 / 2 / 21 ) 
-        input_vel =( u0 / 2 / 21 ) + robot_vel.linear.x
+        # input_vel =( u0 / 2 / 21 ) + robot_vel.linear.x
         
-        # input_vel =( u0 * (t1 - t0) / 21 ) + robot_vel.linear.x
+        input_vel =( u0 * (t1 - t0) / 17 ) + robot_vel.linear.x
 
         print("time",(t1 - t0))
 

@@ -67,14 +67,14 @@ set(dual_gazebo_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(dual_gazebo_SOURCE_PREFIX /home/yoseph/worckspace/MPC-Inverted-pendulum-in-gazebo/src/dual_gazebo)
-  set(dual_gazebo_DEVEL_PREFIX /home/yoseph/worckspace/MPC-Inverted-pendulum-in-gazebo/devel)
+  set(dual_gazebo_SOURCE_PREFIX /home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/src/dual_gazebo)
+  set(dual_gazebo_DEVEL_PREFIX /home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/devel)
   set(dual_gazebo_INSTALL_PREFIX "")
   set(dual_gazebo_PREFIX ${dual_gazebo_DEVEL_PREFIX})
 else()
   set(dual_gazebo_SOURCE_PREFIX "")
   set(dual_gazebo_DEVEL_PREFIX "")
-  set(dual_gazebo_INSTALL_PREFIX /home/yoseph/worckspace/MPC-Inverted-pendulum-in-gazebo/install)
+  set(dual_gazebo_INSTALL_PREFIX /home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/install)
   set(dual_gazebo_PREFIX ${dual_gazebo_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/yoseph/worckspace/MPC-Inverted-pendulum-in-gazebo/install/lib;/opt/ros/noetic/lib)
+    foreach(path /home/yang/workspace/MPC-Inverted-pendulum-in-gazebo/install/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
